@@ -1,3 +1,5 @@
 The assets file is where all of the images for the pygame are put. You can change them to your preference,
 but the names are all case-sensitive. If you want to change the names, edit the program code near the top.
-There is a comment telling you where and what to change.
+There is a comment telling you where and what to change. 
+
+By the way, discovery_class.png is actually Sovereign class, I was just to lazy to rename it.
