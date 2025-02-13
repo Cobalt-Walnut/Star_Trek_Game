@@ -1,0 +1,4 @@
+Here, all of the sounds used in the game are stored. You can change them if you want, but keep in mind that
+the names of the sounds and the format (.wav) must stay the same. If you want to change the format, edit
+the code near the top of the main function ( Lines 856 - 861). I got the sounds at (https://freesound.org).
+It's a great website to get sounds.
