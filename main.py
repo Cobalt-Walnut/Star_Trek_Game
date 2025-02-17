@@ -14,6 +14,8 @@ import random
 import math
 import time
 import asyncio
+import sys
+import os
 
 WIDTH, HEIGHT = 1400, 800
 
@@ -27,19 +29,24 @@ BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 PURPLE = (128, 0, 128)
 
+# Get the correct path whether running as a script or an executable
+def resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
-# Loads all images needed
+# Load images with updated paths
 def load_images():
     images = {
-        "constitution": pygame.image.load("assets/constitution_class.png").convert_alpha(),
-        "galaxy": pygame.image.load("assets/galaxy_class1.png").convert_alpha(),
-        "invincible": pygame.image.load("assets/invincible_class.png").convert_alpha(),
-        "intrepid": pygame.image.load("assets/intrepid_class1.png").convert_alpha(),
-        "discovery": pygame.image.load("assets/discovery_class.png").convert_alpha(),
-        "klingon": pygame.image.load("assets/klingon_ship1.png").convert_alpha(),
-        "romulan": pygame.image.load("assets/romulan_ship.png").convert_alpha(),
-        "background": pygame.image.load("assets/space_background.png").convert(),
-        "warp_drive": pygame.image.load("assets/warp_drive.png").convert_alpha(),
+        "constitution": pygame.image.load(resource_path("assets/constitution_class.png")).convert_alpha(),
+        "galaxy": pygame.image.load(resource_path("assets/galaxy_class1.png")).convert_alpha(),
+        "invincible": pygame.image.load(resource_path("assets/invincible_class.png")).convert_alpha(),
+        "intrepid": pygame.image.load(resource_path("assets/intrepid_class1.png")).convert_alpha(),
+        "discovery": pygame.image.load(resource_path("assets/discovery_class.png")).convert_alpha(), # Sovereign classv
+        "klingon": pygame.image.load(resource_path("assets/klingon_ship1.png")).convert_alpha(),
+        "romulan": pygame.image.load(resource_path("assets/romulan_ship.png")).convert_alpha(),
+        "background": pygame.image.load(resource_path("assets/space_background.png")).convert(),
+        "warp_drive": pygame.image.load(resource_path("assets/warp_drive.png")).convert_alpha(),
     }
 
     # Resize images
@@ -47,17 +54,17 @@ def load_images():
     images["galaxy"] = pygame.transform.scale(images["galaxy"], (110, 150))
     images["invincible"] = pygame.transform.scale(images["invincible"], (100, 190))
     images["intrepid"] = pygame.transform.scale(images["intrepid"], (87, 153))
-    images["discovery"] = pygame.transform.scale(images["discovery"], (95, 205))
+    images["discovery"] = pygame.transform.scale(images["discovery"], (95, 205)) # Sovereign class
     images["klingon"] = pygame.transform.scale(images["klingon"], (76, 90))
     images["romulan"] = pygame.transform.scale(images["romulan"], (60, 75))
     images["warp_drive"] = pygame.transform.scale(images["warp_drive"], (WIDTH, HEIGHT))
     images["background"] = pygame.transform.scale(images["background"], (WIDTH, HEIGHT))
 
     # Explosion images
-    images["explosion"] = [pygame.image.load(f"assets/explosion_{i}.png").convert_alpha() for i in range(6)]
+    images["explosion"] = [pygame.image.load(resource_path(f"assets/explosion_{i}.png")).convert_alpha() for i in range(6)]
     images["explosion"] = [pygame.transform.scale(img, (65, 65)) for img in images["explosion"]]
 
-    images["small_explosion"] = [pygame.image.load(f"assets/explosion_{i}.png").convert_alpha() for i in range(6)]
+    images["small_explosion"] = [pygame.image.load(resource_path(f"assets/explosion_{i}.png")).convert_alpha() for i in range(6)]
     images["small_explosion"] = [pygame.transform.scale(img, (30, 30)) for img in images["small_explosion"]]
 
     return images
@@ -394,7 +401,7 @@ class DarkMatterTorpedo(SpecialWeapon):
 class Starbase(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load('assets/starbase.png').convert_alpha()
+        self.image = pygame.image.load(resource_path('assets/starbase.png')).convert_alpha()
         self.image = pygame.transform.scale(self.image, (100, 100))
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, WIDTH - self.rect.width)
@@ -621,50 +628,56 @@ ship_class_info = {
 }
 
 def choose_ship_class(screen):
-    screen.fill(BLACK)
+    screen.fill((0, 0, 0))
     font = pygame.font.Font(None, 52)
     info_font = pygame.font.Font(None, 42)
-
-    title = font.render("Choose Your Ship Class", True, WHITE)
+    
+    title = font.render("Choose Your Ship Class", True, (255, 255, 255))
     screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 50))
-
+    
     classes = list(ship_class_info.keys())
+    ship_images = {
+        "Constitution": pygame.image.load(resource_path("assets/constitution_class-Copy.png")),
+        "Galaxy": pygame.image.load(resource_path("assets/galaxy_class1-Copy.png")),
+        "Invincible": pygame.image.load(resource_path("assets/invincible_class-Copy.png")),
+        "Intrepid": pygame.image.load(resource_path("assets/intrepid_class1-Copy.png")),
+        "Sovereign": pygame.image.load(resource_path("assets/discovery_class-Copy.png"))
+    }
+    ship_sizes = {
+        "Constitution": (155, 80),
+        "Galaxy": (150, 110),
+        "Invincible": (190, 100),
+        "Intrepid": (153, 87),
+        "Sovereign": (205, 95)
+    }
     buttons = []
-
+    
     for i, ship_class in enumerate(classes):
         button = pygame.Rect(WIDTH // 2 - 150, 200 + i * 120, 320, 70)
-        pygame.draw.rect(screen, WHITE, button, 2)  
-        text = font.render(ship_class, True, WHITE)
-        screen.blit(
-            text,
-            (
-                button.centerx - text.get_width() // 2,
-                button.centery - text.get_height() // 2,
-            ),
-        )
+        pygame.draw.rect(screen, (255, 255, 255), button, 2)
+        text = font.render(ship_class, True, (255, 255, 255))
+        screen.blit(text, (button.centerx - text.get_width() // 2, button.centery - text.get_height() // 2))
+        
+        ship_image = pygame.transform.scale(ship_images[ship_class], ship_sizes[ship_class])
+        ship_x = WIDTH // 2 - 400 - ship_sizes[ship_class][0] // 2  # Adjust ship placement to the left of buttons
+        ship_y = button.centery - ship_sizes[ship_class][1] // 2  # Center ship vertically with button
+        screen.blit(ship_image, (ship_x, ship_y))
+        
         buttons.append((button, ship_class))
-
-    # Info box rectangle
+    
     info_rect = pygame.Rect(50, HEIGHT - 240, WIDTH - 100, 180)
     
-    # "How to Play" button
     htp_rect = pygame.Rect(WIDTH - 250, HEIGHT - 700, 200, 50)
-    htp_text = info_font.render("How to Play", True, WHITE)
-    pygame.draw.rect(screen, WHITE, htp_rect, 2)
-    screen.blit(
-        htp_text,
-        (
-            htp_rect.centerx - htp_text.get_width() // 2,
-            htp_rect.centery - htp_text.get_height() // 2,
-        ),
-    )
-
+    htp_text = info_font.render("How to Play", True, (255, 255, 255))
+    pygame.draw.rect(screen, (255, 255, 255), htp_rect, 2)
+    screen.blit(htp_text, (htp_rect.centerx - htp_text.get_width() // 2, htp_rect.centery - htp_text.get_height() // 2))
+    
     pygame.display.flip()
-
+    
     while True:
         mouse_pos = pygame.mouse.get_pos()
         hover_info = None
-
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return None
@@ -674,48 +687,35 @@ def choose_ship_class(screen):
                         return ship_class
                 if htp_rect.collidepoint(event.pos):
                     show_how_to_play(screen)
-                    return choose_ship_class(screen)  # Restart ship selection after instructions
-
-        # Check if mouse is hovering over a ship button
+                    return choose_ship_class(screen)
+        
         for rect, ship_class in buttons:
             if rect.collidepoint(mouse_pos):
                 hover_info = ship_class_info[ship_class]
                 break  
-
-        # Redraw everything
-        screen.fill(BLACK)
+        
+        screen.fill((0, 0, 0))
         screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 50))
-
+        
         for rect, ship_class in buttons:
-            pygame.draw.rect(screen, WHITE, rect, 2)
-            text = font.render(ship_class, True, WHITE)
-            screen.blit(
-                text,
-                (
-                    rect.centerx - text.get_width() // 2,
-                    rect.centery - text.get_height() // 2,
-                ),
-            )
-
-        pygame.draw.rect(screen, WHITE, htp_rect, 2)
-        screen.blit(
-            htp_text,
-            (
-                htp_rect.centerx - htp_text.get_width() // 2,
-                htp_rect.centery - htp_text.get_height() // 2,
-            ),
-        )
-
-        # Display ship info when hovering
+            pygame.draw.rect(screen, (255, 255, 255), rect, 2)
+            text = font.render(ship_class, True, (255, 255, 255))
+            screen.blit(text, (rect.centerx - text.get_width() // 2, rect.centery - text.get_height() // 2))
+            ship_image = pygame.transform.scale(ship_images[ship_class], ship_sizes[ship_class])
+            screen.blit(ship_image, (WIDTH // 2 - 400, rect.top))  # Adjust ship placement
+        
+        pygame.draw.rect(screen, (255, 255, 255), htp_rect, 2)
+        screen.blit(htp_text, (htp_rect.centerx - htp_text.get_width() // 2, htp_rect.centery - htp_text.get_height() // 2))
+        
         if hover_info:
-            pygame.draw.rect(screen, BLACK, info_rect)
-            pygame.draw.rect(screen, WHITE, info_rect, 2)
+            pygame.draw.rect(screen, (0, 0, 0), info_rect)
+            pygame.draw.rect(screen, (255, 255, 255), info_rect, 2)
             y_offset = info_rect.top + 10
             for key, value in hover_info.items():
-                info_text = info_font.render(f"{key}: {value}", True, WHITE)
+                info_text = info_font.render(f"{key}: {value}", True, (255, 255, 255))
                 screen.blit(info_text, (info_rect.left + 10, y_offset))
                 y_offset += 40  
-
+        
         pygame.display.flip()
 
 
@@ -853,12 +853,13 @@ async def main():
     pygame.display.set_caption("Star Trek Game")
 
 
-    phaser_sound = pygame.mixer.Sound("sounds/phaser.wav")
-    torpedo_sound = pygame.mixer.Sound("sounds/torpedo.wav")
-    destroyed_sound = pygame.mixer.Sound("sounds/destroyed.wav")
-    hit_sound = pygame.mixer.Sound("sounds/hit.wav")
-    warp_sound = pygame.mixer.Sound("sounds/warp.wav")
-    special_sound = pygame.mixer.Sound("sounds/special.wav")
+    # Load sounds with updated paths
+    phaser_sound = pygame.mixer.Sound(resource_path("sounds/phaser.wav"))
+    torpedo_sound = pygame.mixer.Sound(resource_path("sounds/torpedo.wav"))
+    destroyed_sound = pygame.mixer.Sound(resource_path("sounds/destroyed.wav"))
+    hit_sound = pygame.mixer.Sound(resource_path("sounds/hit.wav"))
+    warp_sound = pygame.mixer.Sound(resource_path("sounds/warp.wav"))
+    special_sound = pygame.mixer.Sound(resource_path("sounds/special.wav"))
     
     global images  # Make the images accessible globally
     images = load_images()  # Load images into a global dictionary
